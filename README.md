@@ -97,7 +97,8 @@ But where's the magic?
 
 Who's the man behind the curtain you ask?
 
-Well... I lied. This demo doesn't use self-signed certificates.
+Well... I lied. This demo doesn't use self-signed certificates
+(not in the server at least).
 It uses a self-signed Root CA and a signed certificate.
 
 It turns out that self-signed certificates were designed to be
