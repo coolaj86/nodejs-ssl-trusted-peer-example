@@ -17,16 +17,10 @@ An example that works.
 
 ```bash
 example
-├── package.json
 ├── make-root-ca-and-certificates.sh
+├── package.json
 ├── serve.js
-├── request-without-warnings.js
-├── server
-|   ├── my-private-root-ca.crt.pem
-|   ├── my-server.crt.pem
-|   └── my-server.key.pem
-└── client
-    └── my-private-root-ca.crt.pem
+└── request-without-warnings.js
 ```
 
 ### Get the repo
@@ -49,6 +43,16 @@ bash test.sh
 
 ```bash
 bash make-root-ca-and-certificates.sh 'local.ldsconnect.org'
+```
+
+```
+example
+├── server
+|   ├── my-private-root-ca.crt.pem
+|   ├── my-server.crt.pem
+|   └── my-server.key.pem
+└── client
+    └── my-private-root-ca.crt.pem
 ```
 
 ### Run the server
