@@ -1,15 +1,33 @@
 nodejs-self-signed-certificate-example
 ======================================
 
-An example that works.
-
 The end off all your self-signed certificate woes (in node.js at least)
+
+This is an easy-as-git-clone example that will get you on your way without
+any `DEPTH_ZERO_SELF_SIGNED_CERT` or `SSL certificate problem: Invalid certificate chain` headaches.
+
+See 
+[the explanation](https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js) for
+the many details.
 
 Test for yourself
 ---
 
-This is an easy-as-git-clone example that will get you on your way without
-any `DEPTH_ZERO_SELF_SIGNED_CERT` or `SSL certificate problem: Invalid certificate chain` headaches.
+An example that works.
+
+```bash
+example
+├── package.json
+├── make-root-ca-and-certificates.sh
+├── serve.js
+├── request-without-warnings.js
+├── server
+|   ├── my-private-root-ca.crt.pem
+|   ├── my-server.crt.pem
+|   └── my-server.key.pem
+└── client
+    └── my-private-root-ca.crt.pem
+```
 
 ### Get the repo
 
@@ -25,7 +43,7 @@ npm install
 bash test.sh
 ```
 
-### Create certificates for `local.ldsconnect.org`
+### Create certificates for your FQDN
 
 `local.ldsconnect.org` points to `localhost`, so it's ideal for your first test.
 
@@ -36,7 +54,7 @@ bash make-root-ca-and-certificates.sh 'local.ldsconnect.org'
 ### Run the server
 
 ```bash
-node ./serve.js 4443 &
+node ./serve.js 8043 &
 # use `fg` and `ctrl+c` to kill
 ```
 
@@ -50,7 +68,7 @@ Visit in a web browser
 Test (warning free) in node.js
 
 ```bash
-node ./request-without-warnings.js 4443
+node ./request-without-warnings.js 8043
 ```
 
 Test (warning free) with cURL

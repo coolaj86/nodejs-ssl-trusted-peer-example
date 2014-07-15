@@ -2,7 +2,7 @@
 'use strict';
 
 var https = require('https')
-  , port = process.argv[2] || 4443
+  , port = process.argv[2] || 8043
   , fs = require('fs')
   , path = require('path')
   , server
