@@ -61,10 +61,6 @@ node ./serve.js 8043 &
 
 ### Test in a client
 
-Visit in a web browser
-
-<https://local.ldsconnect.org>
-
 Test (warning free) in node.js
 
 ```bash
@@ -77,6 +73,17 @@ Test (warning free) with cURL
 curl -v https://local.ldsconnect.org \
   --cacert client/my-private-root-ca.crt.pem
 ```
+
+Visit in a web browser
+
+<https://local.ldsconnect.org>
+
+To get rid of the warnings, simply add the certificate in the `client` folder
+to your list of certificates by alt-clicking "Open With => Keychain Access"
+on `my-private-root-ca.crt.pem`
+
+You do have to set `Always Trust` a few times
+[as explained](http://www.robpeck.com/2010/10/google-chrome-mac-os-x-and-self-signed-ssl-certificates/#.U8RqrI1dVd8) by Rob Peck.
 
 Now season to taste
 ---
