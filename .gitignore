@@ -1,6 +1,4 @@
-all/
-server/
-client/
+certs
 
 # Logs
 logs

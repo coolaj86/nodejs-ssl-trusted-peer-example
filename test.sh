@@ -17,14 +17,14 @@ sleep 1
 
 echo ""
 curl https://local.ldsconnect.org:8043 \
-  --cacert client/my-private-root-ca.crt.pem
+  --cacert certs/client/my-root-ca.crt.pem
 echo -n " - without warnings, love cURL"
 echo ""
 sleep 1
 
 # For lots of output about the ssl connection try -v
 #curl -v https://local.ldsconnect.org:8043 \
-#  --cacert client/my-private-root-ca.crt.pem
+#  --cacert certs/client/my-root-ca.crt.pem
 
 kill ${NODE_PID}
 echo ""

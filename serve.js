@@ -11,14 +11,14 @@ var https = require('https')
 
 require('ssl-root-cas')
   .inject()
-  .addFile(path.join(__dirname, 'server', 'my-private-root-ca.crt.pem'))
+  .addFile(path.join(__dirname, 'certs', 'server', 'my-root-ca.crt.pem'))
   ;
 
 options = {
-  key: fs.readFileSync(path.join(__dirname, 'server', 'my-server.key.pem'))
+  key: fs.readFileSync(path.join(__dirname, 'certs', 'server', 'my-server.key.pem'))
 // You don't need to specify `ca`, it's done by `ssl-root-cas`
-//, ca: [ fs.readFileSync(path.join(__dirname, 'server', 'my-private-root-ca.crt.pem'))]
-, cert: fs.readFileSync(path.join(__dirname, 'server', 'my-server.crt.pem'))
+//, ca: [ fs.readFileSync(path.join(__dirname, 'certs', 'server', 'my-root-ca.crt.pem'))]
+, cert: fs.readFileSync(path.join(__dirname, 'certs', 'server', 'my-server.crt.pem'))
 };
 
 

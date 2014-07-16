@@ -2,11 +2,11 @@
 FQDN=$1
 
 # make directories to work from
-mkdir -p server/ client/ all/
+mkdir -p certs/{server,client,ca,tmp}
 
 # Create your very own Root Certificate Authority
 openssl genrsa \
-  -out all/my-private-root-ca.key.pem \
+  -out certs/ca/my-root-ca.key.pem \
   2048
 
 # Self-sign your Root Certificate Authority
@@ -15,34 +15,39 @@ openssl req \
   -x509 \
   -new \
   -nodes \
-  -key all/my-private-root-ca.key.pem \
+  -key certs/ca/my-root-ca.key.pem \
   -days 1024 \
-  -out all/my-private-root-ca.crt.pem \
+  -out certs/ca/my-root-ca.crt.pem \
   -subj "/C=US/ST=Utah/L=Provo/O=ACME Signing Authority Inc/CN=example.com"
 
 # Create a Device Certificate for each domain,
 # such as example.com, *.example.com, awesome.example.com
 # NOTE: You MUST match CN to the domain name or ip address you want to use
 openssl genrsa \
-  -out all/my-server.key.pem \
+  -out certs/server/my-server.key.pem \
   2048
 
 # Create a request from your Device, which your Root CA will sign
 openssl req -new \
-  -key all/my-server.key.pem \
-  -out all/my-server.csr.pem \
+  -key certs/server/my-server.key.pem \
+  -out certs/tmp/my-server.csr.pem \
   -subj "/C=US/ST=Utah/L=Provo/O=ACME Tech Inc/CN=${FQDN}"
 
 # Sign the request from Device with your Root CA
+# -CAserial certs/ca/my-root-ca.srl
 openssl x509 \
-  -req -in all/my-server.csr.pem \
-  -CA all/my-private-root-ca.crt.pem \
-  -CAkey all/my-private-root-ca.key.pem \
+  -req -in certs/tmp/my-server.csr.pem \
+  -CA certs/ca/my-root-ca.crt.pem \
+  -CAkey certs/ca/my-root-ca.key.pem \
   -CAcreateserial \
-  -out all/my-server.crt.pem \
+  -out certs/server/my-server.crt.pem \
   -days 500
 
+# Create a public key, for funzies
+openssl rsa \
+  -in certs/server/my-server.key.pem \
+  -pubout -out certs/client/my-server.pub
+
 # Put things in their proper place
-rsync -a all/my-server.{key,crt}.pem server/
-rsync -a all/my-private-root-ca.crt.pem server/
-rsync -a all/my-private-root-ca.crt.pem client/
+rsync -a certs/ca/my-root-ca.crt.pem certs/server/
+rsync -a certs/ca/my-root-ca.crt.pem certs/client/

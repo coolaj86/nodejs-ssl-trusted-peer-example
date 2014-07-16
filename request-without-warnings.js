@@ -4,7 +4,7 @@
 var https = require('https')
   , fs = require('fs')
   , path = require('path')
-  , ca = fs.readFileSync(path.join(__dirname, 'client', 'my-private-root-ca.crt.pem'))
+  , ca = fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-root-ca.crt.pem'))
   , port = process.argv[2] || 8043
   , hostname = process.argv[3] || 'local.ldsconnect.org'
   ;

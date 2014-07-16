@@ -46,13 +46,20 @@ bash make-root-ca-and-certificates.sh 'local.ldsconnect.org'
 ```
 
 ```
-example
+certs/
+├── ca
+│   ├── my-root-ca.crt.pem
+│   ├── my-root-ca.key.pem
+│   └── my-root-ca.srl
+├── client
+│   ├── my-root-ca.crt.pem
+│   └── my-server.pub
 ├── server
-|   ├── my-private-root-ca.crt.pem
-|   ├── my-server.crt.pem
-|   └── my-server.key.pem
-└── client
-    └── my-private-root-ca.crt.pem
+│   ├── my-root-ca.crt.pem
+│   ├── my-server.crt.pem
+│   └── my-server.key.pem
+└── tmp
+    └── my-server.csr.pem
 ```
 
 ### Run the server
@@ -75,7 +82,7 @@ Test (warning free) with cURL
 
 ```bash
 curl -v https://local.ldsconnect.org \
-  --cacert client/my-private-root-ca.crt.pem
+  --cacert client/my-root-ca.crt.pem
 ```
 
 Visit in a web browser
@@ -84,7 +91,7 @@ Visit in a web browser
 
 To get rid of the warnings, simply add the certificate in the `client` folder
 to your list of certificates by alt-clicking "Open With => Keychain Access"
-on `my-private-root-ca.crt.pem`
+on `my-root-ca.crt.pem`
 
 You do have to set `Always Trust` a few times
 [as explained](http://www.robpeck.com/2010/10/google-chrome-mac-os-x-and-self-signed-ssl-certificates/#.U8RqrI1dVd8) by Rob Peck.
