@@ -44,6 +44,13 @@ npm install
 bash test.sh
 ```
 
+This will
+
+* create all of the keys
+* ask you to create a file to protect your p12 file
+* (needed to allow Chrome, Safari, and other apps to use your key + crt in OS X Keychain Access)
+* run the tests and print happy messages
+
 ### Create certificates for your FQDN
 
 `local.foobar3000.com` points to `localhost`, so it's ideal for your first test.
@@ -51,6 +58,11 @@ bash test.sh
 ```bash
 bash make-root-ca-and-certificates.sh local.foobar3000.com 8043
 ```
+
+This will ask you to create a passphrase to protect your p12 file.
+If you forget the passphrase, the file can easily be recreated later (see source in the file).
+
+For the purposes of this tutorial, I recommend choosing 'secret'
 
 ```
 certs/
@@ -61,9 +73,8 @@ certs/
 ├── client
 │   ├── my-app-client.crt.pem
 │   ├── my-app-client.key.pem
-│   ├── my-app-client.pub
-│   ├── my-root-ca.crt.pem
-│   └── my-server.pub
+│   ├── my-app-client.p12
+│   └── my-root-ca.crt.pem
 ├── server
 │   ├── my-root-ca.crt.pem
 │   ├── my-server.crt.pem
@@ -104,7 +115,8 @@ Visit in a web browser
 
 To get rid of the browser warnings, simply add the certificate from the `client` folder
 to your list of certificates by alt-clicking "Open With => Keychain Access"
-on `my-root-ca.crt.pem`
+on `my-root-ca.crt.pem` and also on `my-app-client.p12`
+(you will need to use the passphrase you created earlier)
 
 You do have to set `Always Trust` a few times
 [as explained](http://www.robpeck.com/2010/10/google-chrome-mac-os-x-and-self-signed-ssl-certificates/#.U8RqrI1dVd8) by Rob Peck.

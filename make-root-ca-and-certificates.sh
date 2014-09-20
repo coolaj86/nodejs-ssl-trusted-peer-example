@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e -u
 FQDN=$1
 
 # make directories to work from
@@ -46,9 +47,9 @@ openssl x509 \
   -days 1095
 
 # Create a public key, for funzies
-openssl rsa \
-  -in certs/server/my-server.key.pem \
-  -pubout -out certs/client/my-server.pub
+#openssl rsa \
+#  -in certs/server/my-server.key.pem \
+#  -pubout -out certs/client/my-server.pub
 
 
 
@@ -77,11 +78,30 @@ openssl x509 \
   -out certs/client/my-app-client.crt.pem \
   -days 1095
 
+# Needed for Safari, Chrome, and other Apps in OS X Keychain Access
+echo ""
+echo ""
+echo "You must create a p12 passphrase. Consider using 'secret' for testing and demo purposes."
+openssl pkcs12 -export \
+  -in certs/client/my-app-client.crt.pem \
+  -inkey certs/client/my-app-client.key.pem \
+  -out certs/client/my-app-client.p12
+echo ""
+echo ""
+
 # Create a public key, for funzies
-openssl rsa \
-  -in certs/client/my-app-client.key.pem \
-  -pubout -out certs/client/my-app-client.pub
+#openssl rsa \
+#  -in certs/client/my-app-client.key.pem \
+#  -pubout -out certs/client/my-app-client.pub
 
 # Put things in their proper place
 rsync -a certs/ca/my-root-ca.crt.pem certs/server/
 rsync -a certs/ca/my-root-ca.crt.pem certs/client/
+
+tree certs/
+
+echo ""
+echo ""
+echo "Remember to open certs/client/my-root-ca.crt.pem and certs/client/my-app-client.p12"
+echo "in Keychain Access on OS X / iOS if you wish to test your site with Safari, Chrome, etc"
+echo ""
