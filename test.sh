@@ -1,6 +1,8 @@
 #!/bin/bash
+FQDN='local.foobar3000.com'
+PORT=8043
 
-bash make-root-ca-and-certificates.sh 'local.ldsconnect.org'
+bash make-root-ca-and-certificates.sh "${FQDN}"
 echo ""
 
 echo ""
@@ -10,21 +12,16 @@ sleep 1
 
 echo ""
 echo ""
-node ./request-without-warnings.js 8043 'local.ldsconnect.org'
+node ./request-without-warnings.js "${FQDN}" "${PORT}" 
 echo -n " - without warnings, love node.js' https"
 echo ""
 sleep 1
 
 echo ""
-curl https://local.ldsconnect.org:8043 \
-  --cacert certs/client/my-root-ca.crt.pem
+./request.sh "${FQDN}" "${PORT}"
 echo -n " - without warnings, love cURL"
 echo ""
 sleep 1
-
-# For lots of output about the ssl connection try -v
-#curl -v https://local.ldsconnect.org:8043 \
-#  --cacert certs/client/my-root-ca.crt.pem
 
 kill ${NODE_PID}
 echo ""

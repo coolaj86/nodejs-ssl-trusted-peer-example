@@ -4,16 +4,17 @@
 var https = require('https')
   , fs = require('fs')
   , path = require('path')
-  , ca = fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-root-ca.crt.pem'))
-  , port = process.argv[2] || 8043
-  , hostname = process.argv[3] || 'local.ldsconnect.org'
+  , hostname = process.argv[2] || 'local.foobar3000.com'
+  , port = process.argv[3] || 8043
   ;
 
 var options = {
   host: hostname
 , port: port
 , path: '/'
-, ca: ca
+, ca: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-root-ca.crt.pem'))
+, key: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-app-client.key.pem'))
+, cert: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-app-client.crt.pem'))
 };
 options.agent = new https.Agent(options);
 

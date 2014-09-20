@@ -1,14 +1,20 @@
-nodejs-self-signed-certificate-example
-======================================
+nodejs-ssl-trusted-peer-example
+===============================
 
-The end off all your self-signed certificate woes (in node.js at least)
+This is a working example of a trusted-peer setup using HTTPS / SSL.
 
-This is an easy-as-git-clone example that will get you on your way without
-any `DEPTH_ZERO_SELF_SIGNED_CERT` or `SSL certificate problem: Invalid certificate chain` headaches.
+* You are your own Root Certificate Authority
+* Your primary server has a certificate signed by your CA
+* Your clients also have certificates signed by your CA
+* Client/Peer certificates which have not been signed by a trusted authority (your CA) are rejected.
+* The built-in CA list is *replaced* rather than appended to (see [ssl-root-cas](https://github.com/coolaj86/node-ssl-root-cas) for appending).
 
-See 
-[the explanation](https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js) for
-the many details.
+This is a kind of "part 2" to
+[coolaj86/nodejs-self-signed-certificate-example](https://github.com/coolaj86/nodejs-self-signed-certificate-example).
+
+See also:
+* [nategood/node-auth](https://github.com/nategood/node-auth).
+* [coolaj86/Painless-Self-Signed-Certificates-in-node](https://github.com/coolaj86/node-ssl-root-cas/wiki/Painless-Self-Signed-Certificates-in-node.js)
 
 Test for yourself
 ---
@@ -20,14 +26,15 @@ example
 ├── make-root-ca-and-certificates.sh
 ├── package.json
 ├── serve.js
+├── request.sh
 └── request-without-warnings.js
 ```
 
 ### Get the repo
 
 ```bash
-git clone git@github.com:coolaj86/nodejs-self-signed-certificate-example.git
-pushd nodejs-self-signed-certificate-example
+git clone git@github.com:coolaj86/nodejs-ssl-trusted-peer-example.git
+pushd nodejs-ssl-trusted-peer-example
 npm install
 ```
 
@@ -39,10 +46,10 @@ bash test.sh
 
 ### Create certificates for your FQDN
 
-`local.ldsconnect.org` points to `localhost`, so it's ideal for your first test.
+`local.foobar3000.com` points to `localhost`, so it's ideal for your first test.
 
 ```bash
-bash make-root-ca-and-certificates.sh 'local.ldsconnect.org'
+bash make-root-ca-and-certificates.sh local.foobar3000.com 8043
 ```
 
 ```
@@ -52,6 +59,9 @@ certs/
 │   ├── my-root-ca.key.pem
 │   └── my-root-ca.srl
 ├── client
+│   ├── my-app-client.crt.pem
+│   ├── my-app-client.key.pem
+│   ├── my-app-client.pub
 │   ├── my-root-ca.crt.pem
 │   └── my-server.pub
 ├── server
@@ -59,6 +69,7 @@ certs/
 │   ├── my-server.crt.pem
 │   └── my-server.key.pem
 └── tmp
+    ├── my-app-client.csr.pem
     └── my-server.csr.pem
 ```
 
@@ -75,21 +86,23 @@ node ./serve.js 8043 &
 Test (warning free) in node.js
 
 ```bash
-node ./request-without-warnings.js 8043
+node ./request-without-warnings.js local.foobar3000.com 8043
 ```
 
 Test (warning free) with cURL
 
 ```bash
-curl -v https://local.ldsconnect.org \
-  --cacert client/my-root-ca.crt.pem
+curl -v -s "https://local.foobar3000.com:8043" \
+  --key certs/client/my-app-client.key.pem \
+  --cert certs/client/my-app-client.crt.pem \
+  --cacert certs/client/my-root-ca.crt.pem
 ```
 
 Visit in a web browser
 
-<https://local.ldsconnect.org>
+<https://local.foobar3000.com:8043>
 
-To get rid of the warnings, simply add the certificate in the `client` folder
+To get rid of the browser warnings, simply add the certificate from the `client` folder
 to your list of certificates by alt-clicking "Open With => Keychain Access"
 on `my-root-ca.crt.pem`
 
@@ -100,21 +113,65 @@ Now season to taste
 ---
 
 You can poke around in the files for generating the certificates, 
-but all you really have to do is replace `local.ldsconnect.org`
+but all you really have to do is replace `local.foobar3000.com`
 with your very own domain name.
 
-But where's the magic?
+Show me the Magic!
 ====
 
-Who's the man behind the curtain you ask?
+You have 3 different certificates with private / public pairs:
 
-Well... I lied. This demo doesn't use self-signed certificates
-(not in the server at least).
-It uses a self-signed Root CA and a signed certificate.
+* The Root CA (CN=example.com), which is used to sign the other certs
+* The Server Cert (CN=local.foobar3000.com), which is signed by the Root CA
+* The Peer Cert (CN=client.example.net), which is signed by the Root CA
 
-It turns out that self-signed certificates were designed to be
-used by the Root Certificate Authorities, not by web servers.
+Since the server's CA list is overwritten with *only* the self-signed Root CA
+only clients which have a certificate signed by that CA
+will be trusted
+(or potentially something else in the same certificate chain).
 
-So instead of trying to work through eleventeen brazillion errors
-about self-signed certs, you can just create an authority and then
-add the authority to your chain (viola, now it's trusted).
+### On the server
+
+```javascript
+https.createServer({
+  key: fs.readFileSync(path.join(__dirname, 'certs', 'server', 'my-server.key.pem'))
+, ca: [ fs.readFileSync(path.join(__dirname, 'certs', 'server', 'my-root-ca.crt.pem'))]
+, cert: fs.readFileSync(path.join(__dirname, 'certs', 'server', 'my-server.crt.pem'))
+, requestCert: true
+, rejectUnauthorized: true
+})
+```
+
+* `requestCert` asks the client to identify itself.
+* `rejectUnauthorized` prevents clients that aren't in the CA chain from being accepted.
+
+If you need to selectively trust certain servers and clients when serving and making requests,
+or also serve to public clients you may need to have multiple servers and clients.
+[ssl-root-cas](https://github.com/coolaj86/node-ssl-root-cas) will probably help.
+
+### In the client
+
+```javascript
+var options
+  ;
+
+options = {
+  host: 'local.foobar3000.com'
+, port: 8043
+, path: '/'
+, ca: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-root-ca.crt.pem'))
+, key: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-app-client.key.pem'))
+, cert: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-app-client.crt.pem'))
+};
+options.agent = new https.Agent(options);
+
+https.request(options, handler);
+```
+
+The node example for this (<http://nodejs.org/api/https.html>) is a bit confusing.
+I'll have to read the source to better understand why the options are laid out as such.
+
+What About WebSockets?
+---
+
+Viola: https://groups.google.com/forum/#!topic/nodejs/KJPk8aibQHY
