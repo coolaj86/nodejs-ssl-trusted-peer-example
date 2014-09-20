@@ -27,7 +27,7 @@ example
 ├── package.json
 ├── serve.js
 ├── request.sh
-└── request-without-warnings.js
+└── request.js
 ```
 
 ### Get the repo
@@ -94,13 +94,13 @@ node ./serve.js 8043 &
 
 ### Test in a client
 
-Test (warning free) in node.js
+Test in node.js
 
 ```bash
-node ./request-without-warnings.js local.foobar3000.com 8043
+node ./request.js local.foobar3000.com 8043
 ```
 
-Test (warning free) with cURL
+Test with cURL
 
 ```bash
 curl -v -s "https://local.foobar3000.com:8043" \
@@ -113,7 +113,7 @@ Visit in a web browser
 
 <https://local.foobar3000.com:8043>
 
-To get rid of the browser warnings, simply add the certificate from the `client` folder
+To get rid of the browser errors and warnings, simply add the certificate from the `client` folder
 to your list of certificates by alt-clicking "Open With => Keychain Access"
 on `my-root-ca.crt.pem` and also on `my-app-client.p12`
 (you will need to use the passphrase you created earlier)
