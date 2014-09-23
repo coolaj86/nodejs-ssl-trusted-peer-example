@@ -171,7 +171,7 @@ options = {
   host: 'local.foobar3000.com'
 , port: 8043
 , path: '/'
-, ca: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-root-ca.crt.pem'))
+, ca: [ fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-root-ca.crt.pem')) ]
 , key: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-app-client.key.pem'))
 , cert: fs.readFileSync(path.join(__dirname, 'certs', 'client', 'my-app-client.crt.pem'))
 };
