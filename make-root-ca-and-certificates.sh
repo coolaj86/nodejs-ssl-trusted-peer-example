@@ -98,7 +98,11 @@ echo ""
 rsync -a certs/ca/my-root-ca.crt.pem certs/server/
 rsync -a certs/ca/my-root-ca.crt.pem certs/client/
 
-tree certs/
+if [ -n "which tree | grep tree" ]; then
+  tree certs/
+else
+  find certs/
+fi
 
 echo ""
 echo ""
